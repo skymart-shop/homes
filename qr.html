@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Payment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        #qr-code {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Scan to Pay</h1>
+    <div id="qr-code"></div>
+    <p id="instructions"></p>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name'); // Product name
+        const price = urlParams.get('price'); // Product price
+        const upiId = 'kmadhesh1017@okicici'; // Your UPI ID
+        const upiURL = `upi://pay?pa=${upiId}&pn=shopsmart&mc=1234&tid=${Math.random().toString(36).substr(2, 9)}&am=${price}&cu=INR&tn=Payment for ${name}`;
+
+        // Generate QR code
+        const qr = new QRious({
+            element: document.createElement('canvas'),
+            value: upiURL,
+            size: 200
+        });
+
+        // Display QR code and instructions
+        const qrCodeDiv = document.getElementById('qr-code');
+        const img = document.createElement('img');
+        img.src = qr.toDataURL();
+        qrCodeDiv.appendChild(img);
+        document.getElementById('instructions').innerText = `Please scan the QR code to complete your payment of ₹${price} for ${name}.`;
+    </script>
+</body>
+</html>

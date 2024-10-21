@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Cart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #cart-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 10px;
+            width: 250px;
+            margin: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #333;
+            text-align: left;
+        }
+
+        .product-price {
+            color: #ff5722;
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+
+        .product-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .remove-from-cart {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .remove-from-cart:hover {
+            background-color: #ff0000;
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #ff0000;
+        }
+
+        .cart-summary {
+            margin: 20px auto;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .total-amount {
+            color: #ff5722;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .confirm-order-btn {
+            background-color: #7FFF00;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .confirm-order-btn:hover {
+            background-color: #6BE500;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Your Cart</h1>
+    <div id="cart-items"></div>
+
+    <div class="cart-summary" id="cart-summary" style="display: none;">
+        <p class="total-amount">Total Amount: ₹<span id="total-amount">0</span></p>
+        <button class="confirm-order-btn" id="confirm-order-btn" onclick="confirmOrder()">Confirm Order</button>
+    </div>
+
+    <script>
+        // Fetch cart from localStorage
+        function displayCartItems() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cart = JSON.parse(localStorage.getItem('cart')) || []; // Get cart from localStorage
+            const cartSummary = document.getElementById('cart-summary');
+            const totalAmountElement = document.getElementById('total-amount');
+
+            let totalAmount = 0;
+
+            // If cart is empty, show a message
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
+                cartSummary.style.display = 'none'; // Hide total and confirm button
+                return;
+            }
+
+            cartItemsContainer.innerHTML = ''; // Clear previous items
+            cartSummary.style.display = 'block'; // Show total and confirm button
+
+            // Display each item in the cart
+            cart.forEach((item, index) => {
+                const productCard = `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="${item.imageUrl || 'https://via.placeholder.com/250x200'}" alt="${item.name}">
+                        </div>
+                        <div class="product-info">
+                            <h4 class="product-title">${item.name}</h4>
+                            <p class="product-price">₹${item.price}</p>
+                            <p class="product-description">${item.description || 'No description available.'}</p>
+                            <button class="remove-from-cart" onclick="removeFromCart(${index})">Remove from Cart</button>
+                        </div>
+                    </div>
+                `;
+                cartItemsContainer.innerHTML += productCard;
+                totalAmount += item.price; // Calculate total amount
+            });
+
+            totalAmountElement.innerText = totalAmount; // Update total amount display
+        }
+
+        // Remove an item from the cart
+        function removeFromCart(index) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1); // Remove the item at the given index
+            localStorage.setItem('cart', JSON.stringify(cart)); // Save the updated cart back to localStorage
+            displayCartItems(); // Re-render the cart items
+            updateCartCount(); // Update the cart count in the navbar (if applicable)
+        }
+
+        // Update cart count (used for navbar, if applicable)
+        function updateCartCount() {
+            const cartCountElement = document.getElementById('cart-count');
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cartCountElement) {
+                cartCountElement.innerText = cart.length; // Update cart count in the navbar
+            }
+        }
+
+        // Confirm Order function redirects to the payment page (qr.html)
+        function confirmOrder() {
+            const totalAmount = document.getElementById('total-amount').innerText;
+            window.location.href = `totalqr.html?amount=${totalAmount}`; // Redirect to qr.html with total amount as a query param
+        }
+
+        // Display the cart items on page load
+        document.addEventListener('DOMContentLoaded', displayCartItems);
+    </script>
+</body>
+</html>

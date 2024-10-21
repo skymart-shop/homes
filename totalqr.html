@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .qr-container {
+            margin-top: 50px;
+        }
+
+        #qr-code {
+            margin-top: 20px;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            color: #ff5722;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan to Pay</h1>
+    <div class="qr-container">
+        <p class="total-amount">Total Amount: ₹<span id="total-amount">0</span></p>
+        <canvas id="qr-code"></canvas> <!-- Changed from div to canvas for QR code -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script>
+        // Get the total amount from URL query params
+        const urlParams = new URLSearchParams(window.location.search);
+        const totalAmount = urlParams.get('amount');
+        
+        // Display total amount
+        document.getElementById('total-amount').innerText = totalAmount; 
+
+        // Generate UPI QR code (assuming static UPI ID is stored)
+        const upiId = 'kmadhesh1017@okicici'; // Use your UPI ID
+        const qrData = `upi://pay?pa=${upiId}&pn=shopsmart&am=${totalAmount}&cu=INR`; // UPI QR code format
+
+        // Generate and display the QR code
+        QRCode.toCanvas(document.getElementById('qr-code'), qrData, { errorCorrectionLevel: 'H' }, function (error) {
+            if (error) {
+                console.error(error);
+                alert('Failed to generate QR Code. Please try again.');
+            } else {
+                console.log('QR Code generated!');
+            }
+        });
+    </script>
+</body>
+</html>
